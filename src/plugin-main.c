@@ -1,6 +1,6 @@
 /*
-Plugin Name
-Copyright (C) <Year> <Developer> <Email Address>
+obs-airmeter
+Copyright (C) 2026 Jonathan Lewerissa <jonathan.rehuel16@gmail.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,16 +19,27 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-module.h>
 #include <plugin-support.h>
 
+#include "meter.h"
+
+bool airmeter_ui_load(void);
+void airmeter_ui_unload(void);
+
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
 bool obs_module_load(void)
 {
+	if (!airmeter_ui_load()) {
+		obs_log(LOG_ERROR, "cannot start the meter");
+		return false;
+	}
 	obs_log(LOG_INFO, "plugin loaded successfully (version %s)", PLUGIN_VERSION);
 	return true;
 }
 
 void obs_module_unload(void)
 {
+	airmeter_ui_unload();
+	meter_stop();
 	obs_log(LOG_INFO, "plugin unloaded");
 }
