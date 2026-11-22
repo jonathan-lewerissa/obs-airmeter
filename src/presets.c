@@ -21,7 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <math.h>
 #include <string.h>
 
-/* This table must agree with the presets table in README.md. */
+/* This table must agree with the presets table in docs/loudness.md. */
 const struct airmeter_preset airmeter_presets[] = {
 	/* Not published by YouTube. Ian Shepherd (MeterPlugs) measured this value:
 	 * https://www.meterplugs.com/blog/2019/09/18/youtube-changes-loudness-reference-to-14-lufs.html */

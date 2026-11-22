@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for AI agents that work on obs-airmeter. Read README.md first for the product and the loudness targets.
+Instructions for AI agents that work on obs-airmeter. Read README.md first for the product. Read docs/loudness.md for the loudness targets.
 
 ## Project
 
@@ -58,9 +58,9 @@ Use these terms with these meanings only.
 ### Targets
 
 1. The default target is -14 LUFS integrated, ±1 LU, with a -1 dBTP true-peak ceiling.
-2. Keep the presets in one table in the source. The table must agree with the README.
-3. If you change a target value, change the README table in the same commit.
-4. Do not add a target without a public source. Put the source URL in a comment next to the value. If the service does not publish the value, you can use a third-party measurement. Then the README and the code comment must both say "Not published by <service>" and name the source of the measurement.
+2. Keep the presets in one table in the source. The table must agree with the presets table in docs/loudness.md.
+3. If you change a target value, change docs/loudness.md in the same commit.
+4. Do not add a target without a public source. Put the source URL in a comment next to the value. If the service does not publish the value, you can use a third-party measurement. Then docs/loudness.md and the code comment must both say "Not published by <service>" and name the source of the measurement.
 
 ### Scope
 
@@ -102,5 +102,5 @@ Test the meter with the EBU Tech 3341 and Tech 3342 test signals. The values mus
 
 ## Documents
 
-- Write README.md and AGENTS.md in ASD-STE100 style. Use short sentences, active voice, and one meaning for each word.
-- Keep README.md for operators and contributors. Keep AGENTS.md for agents.
+- Write README.md, AGENTS.md, and the files in docs/ in ASD-STE100 style. Use short sentences, active voice, and one meaning for each word.
+- Keep README.md short and for operators. Put details for contributors in docs/. Keep AGENTS.md for agents.

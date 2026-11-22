@@ -17,6 +17,8 @@
 !README.md
 !AGENTS.md
 !tests
+!/docs
+/docs/superpowers
 
 # Exclude lock files
 *.lock.json
