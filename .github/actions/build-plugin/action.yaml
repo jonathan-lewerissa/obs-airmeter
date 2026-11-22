@@ -89,6 +89,14 @@ runs:
 
         .github/scripts/Build-Windows.ps1 @BuildArgs
 
+    - name: Run Measurement Tests 🧪
+      shell: bash
+      working-directory: ${{ inputs.workingDirectory }}
+      run: |
+        build_dir=build_${{ runner.os == 'macOS' && 'macos' || inputs.target }}
+        cmake --build "$build_dir" --config ${{ inputs.config }} --target airmeter-tests
+        ctest --test-dir "$build_dir" -C ${{ inputs.config }} --output-on-failure
+
     - name: Create Summary 📊
       if: contains(fromJSON('["Linux", "macOS"]'),runner.os)
       shell: zsh --no-rcs --errexit --pipefail {0}
