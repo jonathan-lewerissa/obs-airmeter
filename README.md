@@ -2,7 +2,7 @@
 
 obs-airmeter is an OBS Studio plugin. It shows the loudness of the audio that OBS sends to the streaming service. The operator can then keep the stream near a known loudness target.
 
-Status: planning. No code exists yet.
+Status: in development. The plugin is not released yet.
 
 ## The problem
 
@@ -39,12 +39,12 @@ No single loudness target applies to all streaming services. Most services do no
 
 | Source | Integrated loudness | True peak max | Notes | Public source |
 |---|---|---|---|---|
-| YouTube | -14 LUFS | — | YouTube does not publish this value. Third-party measurements give it. YouTube reduces the level of louder audio on playback. It does not increase the level of quieter audio. | None found |
+| YouTube | -14 LUFS | — | Not published by YouTube. Ian Shepherd (MeterPlugs) measured this value. YouTube reduces the level of louder audio on playback. It does not increase the level of quieter audio. | [MeterPlugs measurement](https://www.meterplugs.com/blog/2019/09/18/youtube-changes-loudness-reference-to-14-lufs.html) |
 | Spotify | -14 LUFS | -1 dBTP | Reference value for music content. If the master is louder than -14 LUFS, Spotify recommends -2 dBTP. | [Spotify loudness normalization](https://support.spotify.com/artists/article/loudness-normalization/) |
-| Apple Music | -16 LUFS | — | Apple does not publish this value. Third-party measurements give it. | None found |
+| Apple Music | -16 LUFS | — | Not published by Apple. Ian Shepherd (MeterPlugs) measured this value. | [MeterPlugs measurement](https://www.meterplugs.com/blog/2022/03/23/apple-switch-to-lufs.html) |
 | Twitch | Not published | — | We found no official Twitch loudness target. | — |
-| AES TD1008 (2021), speech and mixed content | -18 LUFS | -1 dBTP | Standard for internet audio streaming. | AES TD1008, from aes.org |
-| AES TD1008 (2021), music | -16 LUFS | -1 dBTP | Standard for internet audio streaming. | AES TD1008, from aes.org |
+| AES TD1008 (2021), speech and mixed content | -18 LUFS | -1 dBTP | Standard for internet audio streaming. | [AES TD1008](https://www.aes.org/technical/documentDownloads.cfm?docID=731) |
+| AES TD1008 (2021), music | -16 LUFS | -1 dBTP | Standard for internet audio streaming. | [AES TD1008](https://www.aes.org/technical/documentDownloads.cfm?docID=731) |
 | EBU R 128 (broadcast) | -23 LUFS | -1 dBTP | TV standard. Too quiet for most streams. | [EBU R 128](https://tech.ebu.ch/publications/r128) |
 
 ### Default target
@@ -57,14 +57,36 @@ The plugin uses these defaults:
 
 Reason: -14 LUFS is the published Spotify target. YouTube does not publish a target, but third-party measurements also give -14 LUFS. The stream is also not too quiet on Twitch.
 
-The plugin will also include these presets:
+### Presets
 
-| Preset | Target | Use |
+Each preset has the name of the target that it is for. The operator selects a preset in the settings.
+
+| Preset | Integrated loudness | Source |
 |---|---|---|
-| Streaming (default) | -14 LUFS | Games, music, mixed content |
-| Speech | -16 LUFS | Talk shows, podcasts, tutorials |
-| AES speech | -18 LUFS | Speech content that follows AES TD1008 |
-| Custom | Operator value | Any other target |
+| YouTube (default) | -14 LUFS | Not published by YouTube. [MeterPlugs measurement](https://www.meterplugs.com/blog/2019/09/18/youtube-changes-loudness-reference-to-14-lufs.html) |
+| Spotify | -14 LUFS | [Spotify](https://support.spotify.com/artists/article/loudness-normalization/) |
+| Apple Music | -16 LUFS | Not published by Apple. [MeterPlugs measurement](https://www.meterplugs.com/blog/2022/03/23/apple-switch-to-lufs.html) |
+| AES TD1008 speech | -18 LUFS | [AES TD1008](https://www.aes.org/technical/documentDownloads.cfm?docID=731) |
+| AES TD1008 music | -16 LUFS | [AES TD1008](https://www.aes.org/technical/documentDownloads.cfm?docID=731) |
+| EBU R 128 | -23 LUFS | [EBU R 128](https://tech.ebu.ch/publications/r128) |
+| Custom | -30 to -5 LUFS, operator value | — |
+
+The true-peak ceiling is a separate setting from -3 to 0 dBTP. The default is -1 dBTP. Twitch has no preset, because Twitch publishes no value.
+
+### Status
+
+The status follows S in the dock. It also follows the S and I values in the full window.
+
+| Difference from the target | Color | Label |
+|---|---|---|
+| No value | grey | No signal |
+| ±1 LU or less | green | On target |
+| 1 LU to 3 LU above | amber | A bit loud |
+| More than 3 LU above | red | Too loud |
+| 1 LU to 3 LU below | amber | A bit quiet |
+| More than 3 LU below | red | Too quiet |
+
+The TP value is red when it is above the ceiling. It is green when it is at or below the ceiling.
 
 At low audio bitrates, the AAC encoder can make peaks higher. For audio bitrates below 128 kbps, set the true peak ceiling to -2 dBTP.
 
@@ -100,7 +122,15 @@ cmake --preset ubuntu-x86_64
 cmake --build --preset ubuntu-x86_64
 ```
 
-The template downloads the OBS sources and dependencies that `buildspec.json` lists. Read the template README for the toolchain versions (Xcode, Visual Studio, GCC, CMake).
+The template downloads the OBS sources and dependencies that `buildspec.json` lists. CMake also downloads libebur128 1.2.6.
+
+### Tests
+
+The build makes the `airmeter-tests` program. It tests the meter with the EBU Tech 3341 and Tech 3342 test signals. macOS:
+
+```sh
+ctest --test-dir build_macos -C RelWithDebInfo --output-on-failure
+``` Read the template README for the toolchain versions (Xcode, Visual Studio, GCC, CMake).
 
 ## Install
 
@@ -113,6 +143,14 @@ Copy the built plugin to the OBS plugin folder for your platform:
 | Linux | `~/.config/obs-studio/plugins/obs-airmeter/` |
 
 Restart OBS. Open the dock from the **Docks** menu.
+
+## Use
+
+- The dock shows S, the status, M, I and the highest true peak.
+- Click ⚙ to open the settings: the track, the preset, the custom target, the true-peak ceiling and the window layout.
+- Click ⤢ to open the full window. Layout A shows five values and one graph of S and M. Layout B shows three graphs (S, I and true peak) and the five values.
+- On Windows, use Alt-Tab to go to the full window. On macOS, use Cmd-` or the ⤢ button.
+- I, LRA, TP max and the graphs reset when the stream starts, when you click **Reset**, and when you select a different track.
 
 ## How it works
 

@@ -32,7 +32,7 @@ Use these terms with these meanings only.
 
 1. Do not change the audio. The plugin only reads audio.
 2. Use libebur128 for all loudness values. Do not write a K-weighting filter.
-3. Use `EBUR128_MODE_M | EBUR128_MODE_S | EBUR128_MODE_I | EBUR128_MODE_LRA | EBUR128_MODE_TRUE_PEAK`.
+3. Use `EBUR128_MODE_M | EBUR128_MODE_S | EBUR128_MODE_I | EBUR128_MODE_LRA | EBUR128_MODE_TRUE_PEAK | EBUR128_MODE_HISTOGRAM`. Histogram mode keeps `ebur128_add_frames_float()` free of memory allocation. It also keeps the I and LRA reads fast.
 4. Report true peak, not sample peak.
 5. Reset the integrated loudness (I) and the LRA when the stream starts.
 6. Show "—" when a value is not available. Do not show `-inf` or `-HUGE_VAL`.
@@ -60,7 +60,7 @@ Use these terms with these meanings only.
 1. The default target is -14 LUFS integrated, ±1 LU, with a -1 dBTP true-peak ceiling.
 2. Keep the presets in one table in the source. The table must agree with the README.
 3. If you change a target value, change the README table in the same commit.
-4. Do not add a target without a public source. Put the source URL in a comment next to the value.
+4. Do not add a target without a public source. Put the source URL in a comment next to the value. If the service does not publish the value, you can use a third-party measurement. Then the README and the code comment must both say "Not published by <service>" and name the source of the measurement.
 
 ### Scope
 
@@ -85,7 +85,7 @@ Use `windows-x64` or `ubuntu-x86_64` in place of `macos` on the other platforms.
 Before you report a change as complete:
 
 1. Build the plugin with no warnings.
-2. Run the measurement tests.
+2. Run the measurement tests: `ctest --test-dir build_macos -C RelWithDebInfo --output-on-failure`.
 3. Load the plugin in OBS. Check the OBS log for errors from the plugin.
 
 ### Measurement tests
@@ -95,8 +95,10 @@ Test the meter with the EBU Tech 3341 and Tech 3342 test signals. The values mus
 ## Code style
 
 - Format C and C++ with the `.clang-format` file from the plugin template.
-- Format CMake with the `.cmake-format.json` file from the plugin template.
+- Format CMake with the `.gersemirc` file from the plugin template.
 - Use the `obs-airmeter` log prefix with `blog()`.
+- Do not write a comment that the code already explains.
+- Write each comment in ASD-STE100 style. Use short sentences, active voice, and one meaning for each word.
 
 ## Documents
 
